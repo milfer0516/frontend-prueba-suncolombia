@@ -1,45 +1,72 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import { useState } from "react";
 import axios from "axios";
-//import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { urlDataBaseIE } from "../service/apiRest";
+import { Alerta } from "../components/Alerta";
 
 const Login = () => {
-	//const history = useNavigate();
+	const history = useNavigate();
 	const [datos, setDatos] = useState({
-		user: "",
-		password: "",
+		User: "",
+		Password: "",
 		option: "",
 	});
+	const [mensaje, setMensaje] = useState({});
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		try {
-			const response = await axios.post(urlDataBaseIE, {
-				user: datos.user,
-				password: datos.password,
-				option: datos.option,
+		if (
+			datos.User != "etraining" ||
+			datos.Password != "explorandoando2020%" ||
+			datos.option != "municipios"
+		) {
+			setMensaje({
+				msg: "Inicio de sesión fallido. Verifica tus credenciales ",
+				error: true,
 			});
-			console.log(response);
+			return;
+		} else {
+			history("municipios");
+		}
+		setMensaje({});
+		try {
+			const response = await axios.post(
+				urlDataBaseIE,
+				{
+					User: datos.User,
+					Password: datos.Password,
+					option: datos.option,
+				},
+				{
+					headers: {
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			console.log(response.data);
+			return response;
 		} catch (error) {
 			console.log(error);
 		}
 	};
+	// eslint-disable-next-line no-unused-vars
+	const { msg } = mensaje;
 
 	const handleChange = (e) => {
 		const newDatos = { ...datos };
 		newDatos[e.target.id] = e.target.value;
 		setDatos(newDatos);
-		console.log(newDatos);
 	};
 
 	return (
 		<>
 			<h1 className="text-center mt-10 text-sky-600 font-black text-5xl capitalize">
-				Iniciar sesión
+				Información Municipios
 			</h1>
-
+			{msg && <Alerta alerta={mensaje} />}
 			<form
 				className="my-10 bd-white shadow rounded-lg px-7 py-4"
 				onSubmit={(e) => handleSubmit(e)}
@@ -47,14 +74,14 @@ const Login = () => {
 				<div className="my-3">
 					<label
 						className="text-gray-600 uppercase block text-xl font-bold"
-						htmlFor="user"
+						htmlFor="User"
 					>
 						user
 					</label>
 					<input
 						type="text"
-						id="user"
-						value={datos.user}
+						id="User"
+						value={datos.User}
 						onChange={(e) => handleChange(e)}
 						placeholder="Ingrese usuario"
 						autoComplete="off"
@@ -64,15 +91,15 @@ const Login = () => {
 				<div className="my-3">
 					<label
 						className="text-gray-600 uppercase block text-xl font-bold"
-						htmlFor="password"
+						htmlFor="Password"
 					>
 						password
 					</label>
 					<input
 						type="text"
-						id="password"
+						id="Password"
 						onChange={(e) => handleChange(e)}
-						value={datos.password}
+						value={datos.Password}
 						placeholder="Ingrese password"
 						className="w-full mt-3 p-2 border rounded-xl bg-gray-50"
 					/>
@@ -94,7 +121,7 @@ const Login = () => {
 					/>
 				</div>
 				<button className="bg-sky-700 mb-5 w-full py-3 text-white uppercase font-bold rounded hover:cursor-pointer hover:bg-sky-800 transition-colors">
-					Enviar
+					Ver información
 				</button>
 			</form>
 		</>
